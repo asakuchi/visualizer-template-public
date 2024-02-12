@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "run-s build:wasm build:js",
+    "build:js": "tsc && vite build",
+    "build:wasm": "cd wasm && wasm-pack build --target web --out-dir ../public/wasm --release",
     "preview": "vite preview",
     "lint:es": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
     "lint:es:fix": "eslint --fix 'src/**/*.{js,jsx,ts,tsx}'",
