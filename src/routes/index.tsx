@@ -3,6 +3,8 @@ import type { FC } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import InitWasm from 'components/InitWasm';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
 import Home from 'components/templates/Home';
 
 const IndexRoutes: FC = () => {

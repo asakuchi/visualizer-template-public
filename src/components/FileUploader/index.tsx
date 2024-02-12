@@ -58,6 +58,8 @@ const FileUploader: FC<FileUploaderProps> = ({ setVisualizerSettingInfo }) => {
         <input
           type="file"
           onChange={onFolderUpload}
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
           directory="" // エディタでエラーが出るが気にしない
           webkitdirectory=""
         />

@@ -10,7 +10,7 @@ type SvgViewerProps = {
 
 const SvgViewer: FC<SvgViewerProps> = ({ visualizerSettingInfo }) => {
   const [animationButtonDescription, setAnimationButtonDescription] = useState(
-    'Save as Aination GIF'
+    'Save as Aination GIF',
   );
 
   const [animationButtonDisabled, setAnimationButtonDisabled] = useState(false);
@@ -20,18 +20,21 @@ const SvgViewer: FC<SvgViewerProps> = ({ visualizerSettingInfo }) => {
     const ret = vis(
       visualizerSettingInfo.input,
       visualizerSettingInfo.output,
-      visualizerSettingInfo.turn
+      visualizerSettingInfo.turn,
     );
     const svg = new DOMParser()
       .parseFromString(ret.svg, 'image/svg+xml')
       .getElementById('vis');
     if (svg === null) return;
     const canvas = document.createElement('canvas');
+    // @ts-ignore
     canvas.width = svg.width.baseVal.value;
+    // @ts-ignore
     canvas.height = svg.width.baseVal.value;
     const ctx = canvas.getContext('2d');
     const image = new Image();
     image.onload = function () {
+      // @ts-ignore
       ctx.drawImage(image, 0, 0);
       const a = document.createElement('a');
       a.href = canvas.toDataURL('image/png');
@@ -61,13 +64,14 @@ const SvgViewer: FC<SvgViewerProps> = ({ visualizerSettingInfo }) => {
     });
     gif.on('progress', function (p) {
       setAnimationButtonDescription(
-        String(Math.round(50 + 50 * p)).padStart(3, ' ') + '% finished'
+        String(Math.round(50 + 50 * p)).padStart(3, ' ') + '% finished',
       );
       /*
       save_gif.value =
         String(Math.round(50 + 50 * p)).padStart(3, ' ') + '% finished';
         */
     });
+    // @ts-ignore
     function add_frame(t) {
       /*
       save_gif.value =
@@ -76,7 +80,8 @@ const SvgViewer: FC<SvgViewerProps> = ({ visualizerSettingInfo }) => {
         */
 
       setAnimationButtonDescription(
-        String(Math.round((50.0 * t) / maxTurn)).padStart(3, ' ') + '% finished'
+        String(Math.round((50.0 * t) / maxTurn)).padStart(3, ' ') +
+          '% finished',
       );
       const svgData = vis(input, output, t).svg;
       const svg = new DOMParser()
@@ -84,7 +89,9 @@ const SvgViewer: FC<SvgViewerProps> = ({ visualizerSettingInfo }) => {
         .getElementById('vis');
       if (svg === null) return;
       const canvas = document.createElement('canvas');
+      // @ts-ignore
       canvas.width = svg.width.baseVal.value;
+      // @ts-ignore
       canvas.height = svg.width.baseVal.value;
       const ctx = canvas.getContext('2d');
       if (ctx === null) return;
