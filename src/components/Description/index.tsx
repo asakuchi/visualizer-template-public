@@ -4,7 +4,7 @@ const Description: FC = () => (
   <div>
     <div>
       <h3>使い方の説明</h3>
-      AHCで配布されるビジュアライザのように動作します。
+      AHC015でビジュアライザ作成の練習。
     </div>
   </div>
 );
