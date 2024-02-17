@@ -1,9 +1,17 @@
 #![allow(non_snake_case, unused_macros)]
+use itertools::Itertools;
 use proconio::input;
 use rand::prelude::*;
-use std::collections::VecDeque;
+use std::{collections::VecDeque, usize};
 use svg::node::element::{Rectangle, Style};
 use web_sys::console::log_1;
+
+/// キャンディの個数(100固定)
+const N: usize = 100;
+/// 箱の高さ(10固定)
+const W: usize = 10;
+/// 箱の幅(10固定)
+const H: usize = 10;
 
 pub trait SetMinMax {
     fn setmin(&mut self, v: Self) -> bool;
@@ -29,218 +37,110 @@ where
 
 #[derive(Clone, Debug)]
 pub struct Input {
-    // pub id: usize,
-    pub n: usize,
-    // pub k: usize,
-    // pub s: Vec<String>,
+    /// t番目に受け取るキャンディーの味
+    pub f: Vec<usize>,
+    /// p_t番目の空きマスにt個目のキャンディーが入れられる
+    pub p: Vec<usize>,
 }
 
 impl std::fmt::Display for Input {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{}", self.n)?;
-        // for i in 0..self.n {
-        //     writeln!(f, "{}", self.s[i])?;
-        // }
+        let text = self.f.iter().join(" ");
+
+        writeln!(f, "{}", &text)?;
+
+        for i in 0..N {
+            writeln!(f, "{}", self.p[i])?;
+        }
+
         Ok(())
     }
 }
 
 pub fn parse_input(f: &str) -> Input {
     let f = proconio::source::once::OnceSource::from(f);
+
+    let n = 100;
+
     input! {
         from f,
-        // id:usize,
-        n: usize,
-        // k: usize,
-        // s: [String; n]
+        candy: [usize; n],
+        p: [usize; n],
     }
-    // Input { id, n, k, s }
-    Input { n }
+
+    Input { f: candy, p }
 }
 
 pub struct Output {
-    // pub q: usize,
-    // pub yxc: Vec<(usize, usize, usize)>,
-    pub m: usize,
+    /// どの方向へ傾けるか
+    pub out: Vec<String>,
 }
 
 pub fn parse_output(f: &str) -> Output {
     let f = proconio::source::once::OnceSource::from(f);
+
     input! {
         from f,
-        // q: usize,
-        // yxc: [(usize, usize, usize); q]
-        m: usize,
+        out: [String; 100],
     }
-    // Output { q, yxc }
-    Output { m }
+
+    log_1(&format!("out: {:?}", out).into());
+
+    Output { out }
 }
 
 pub fn gen(seed: u64) -> Input {
     let mut rng = rand_chacha::ChaCha20Rng::seed_from_u64(seed);
-    // let id = seed;
-    // let n = 100;
-    // let k = 9;
-    // let s = (0..n)
-    //     .map(|_| {
-    //         (0..n)
-    //             .map(|_| rng.gen_range(1, k + 1).to_string())
-    //             .collect::<String>()
-    //     })
-    //     .collect::<Vec<_>>();
 
-    let n = rng.gen_range(0, 100);
+    let f = (0..N).map(|_| rng.gen_range(1, 4)).collect::<Vec<_>>();
 
-    Input { n }
+    let p = (0..N)
+        .map(|t| rng.gen_range(1, 101 - t))
+        .collect::<Vec<_>>();
+
+    Input { f, p }
 }
 
-// fn calculate_score(input: &Input, yxc: &Vec<(usize, usize, usize)>) -> (usize, Vec<Vec<usize>>) {
-//     let mut state = vec![vec![0; input.n]; input.n];
-//     input.s.iter().enumerate().for_each(|(y, s)| {
-//         s.chars()
-//             .enumerate()
-//             .for_each(|(x, c)| state[y][x] = c.to_digit(10).unwrap() as usize)
-//     });
+fn calculate_score(input: &Input, out: &Vec<String>) -> (usize, Vec<Vec<usize>>) {
+    log_1(&"start calculate_score".into());
 
-//     let x_vec: Vec<i32> = vec![0, 1, 0, -1];
-//     let y_vec: Vec<i32> = vec![-1, 0, 1, 0];
+    let mut state = vec![vec![0; W]; H];
 
-//     for (y, x, c) in yxc {
-//         // state[*y][*x] = *c;
-//         let selected_color = state[*y - 1][*x - 1];
+    // log_1(&format!("state: {:?}", state).into());
 
-//         let mut visited = vec![vec![false; input.n]; input.n];
-//         let mut queue: VecDeque<(usize, usize)> = VecDeque::new();
-//         queue.push_back((*y - 1, *x - 1));
+    // log_1(&format!("input.p: {:?}", input.p).into());
+    // log_1(&format!("out.len(): {}", out.len()).into());
 
-//         let mut count = 0;
+    for turn in 0..out.len() {
+        // log_1(&format!("turn: {}", turn).into());
 
-//         while queue.len() > 0 {
-//             let (ypos, xpos) = queue.pop_front().unwrap();
-//             if visited[ypos][xpos] {
-//                 continue;
-//             }
-//             visited[ypos][xpos] = true;
-//             state[ypos][xpos] = *c;
+        state = put_candy(10, turn, &input.f, state, input.p[turn]);
 
-//             count = count + 1;
-//             for i in 0..4 {
-//                 let nx = xpos as i32 + x_vec[i];
-//                 let ny = ypos as i32 + y_vec[i];
-//                 if nx < 0 || ny < 0 || nx >= input.n as i32 || ny >= input.n as i32 {
-//                     continue;
-//                 }
-//                 let nx = nx as usize;
-//                 let ny = ny as usize;
-//                 if visited[ny][nx] {
-//                     continue;
-//                 }
+        // log_1(&format!("state(put_candy): {:?}", state).into());
 
-//                 if state[ny][nx] != selected_color {
-//                     continue;
-//                 }
-//                 queue.push_back((ny, nx));
-//             }
-//         }
-//     }
+        if turn == out.len() - 1 {
+            // 最後のslideはしない
+            break;
+        }
 
-//     let mut score = 0;
-//     for color in 1..(input.k + 1) {
-//         let mut tmp_score = 0;
-//         for y in 0..input.n {
-//             for x in 0..input.n {
-//                 if state[y][x] == color {
-//                     tmp_score += 100;
-//                 }
-//             }
-//         }
-//         score = score.max(tmp_score);
-//     }
-//     score -= yxc.len();
+        state = slide(10, state, out[turn].as_str());
 
-//     return (score, state);
-// }
-
-fn generate_dark_color(code: usize) -> String {
-    // 入力値に基づいてHue（色相）を計算
-    let hue = (code as f32 * 36.0) % 360.0;
-
-    // Saturation（彩度）を低めに、Lightness（明度）を固定値で低く設定
-    let saturation = 30.0;
-    let lightness = 30.0;
-
-    // HSL to RGB 変換
-    let hue_normalized = hue / 360.0;
-    let q = if lightness < 0.5 {
-        lightness * (1.0 + saturation)
-    } else {
-        lightness + saturation - (lightness * saturation)
-    };
-
-    let p = 2.0 * lightness - q;
-
-    let r = hue_to_rgb(p, q, hue_normalized + 1.0 / 3.0);
-    let g = hue_to_rgb(p, q, hue_normalized);
-    let b = hue_to_rgb(p, q, hue_normalized - 1.0 / 3.0);
-
-    // RGB を 16 進数に変換して文字列を返す
-    format!(
-        "#{:02X}{:02X}{:02X}",
-        (r * 255.0) as u8,
-        (g * 255.0) as u8,
-        (b * 255.0) as u8
-    )
-}
-
-fn generate_color(code: usize) -> String {
-    // 入力値に基づいてHue（色相）を計算
-    let hue = (code as f32 * 36.0) % 360.0;
-
-    // Saturation（彩度）とLightness（明度）を固定値で設定
-    let saturation = 10.0;
-    let lightness = 0.1;
-
-    // HSL to RGB 変換
-    let hue_normalized = hue / 360.0;
-    let q = if lightness < 0.5 {
-        lightness * (1.0 + saturation)
-    } else {
-        lightness + saturation - (lightness * saturation)
-    };
-
-    let p = 2.0 * lightness - q;
-
-    let r = hue_to_rgb(p, q, hue_normalized + 1.0 / 3.0);
-    let g = hue_to_rgb(p, q, hue_normalized);
-    let b = hue_to_rgb(p, q, hue_normalized - 1.0 / 3.0);
-
-    // RGB を 16 進数に変換して文字列を返す
-    format!(
-        "#{:02X}{:02X}{:02X}",
-        (r * 255.0) as u8,
-        (g * 255.0) as u8,
-        (b * 255.0) as u8
-    )
-}
-
-fn hue_to_rgb(p: f32, q: f32, t: f32) -> f32 {
-    let t = if t < 0.0 {
-        t + 1.0
-    } else if t > 1.0 {
-        t - 1.0
-    } else {
-        t
-    };
-
-    if t < 1.0 / 6.0 {
-        p + (q - p) * 6.0 * t
-    } else if t < 1.0 / 2.0 {
-        q
-    } else if t < 2.0 / 3.0 {
-        p + (q - p) * (2.0 / 3.0 - t) * 6.0
-    } else {
-        p
+        // log_1(&format!("state(slide): {:?}", state).into());
     }
+
+    let mut candy_counter = vec![0; 4];
+
+    for &candy in input.f.iter() {
+        candy_counter[candy] += 1;
+    }
+
+    // let score = score(10, &state);
+    // return (score, state);
+
+    let score = score(10, &state) as f64
+        / (candy_counter.into_iter().map(|x| x * x).sum::<usize>() as f64)
+        * 1_000_000.;
+    return (score.round() as usize, state);
 }
 
 pub fn rect(x: usize, y: usize, w: usize, h: usize, fill: &str) -> Rectangle {
@@ -253,51 +153,202 @@ pub fn rect(x: usize, y: usize, w: usize, h: usize, fill: &str) -> Rectangle {
 }
 
 pub fn vis(input: &Input, output: &Output, turn: usize) -> (i64, String, String) {
-    // let (score, state) =
-    //     calculate_score(input, &output.yxc[0..turn].into_iter().cloned().collect());
+    log_1(&"start vis".into());
 
-    let W = 10;
-    let H = 10;
-    let w = 50;
-    let h = 50;
+    let (score, state) =
+        calculate_score(input, &output.out[0..turn].into_iter().cloned().collect());
+
+    log_1(&format!("score: {}", score).into());
+    log_1(&format!("state: {:?}", state).into());
+
     let mut doc = svg::Document::new()
         .set("id", "vis")
-        .set("viewBox", (-5, -5, W + 10, H + 10))
-        .set("width", W + 10)
-        .set("height", H + 10)
-        .set("style", "background-color:white");
+        .set("viewBox", (0, 0, W, H))
+        .set("width", 800)
+        .set("height", 800)
+        .set("style", "background-color:white; border: solid");
 
     doc = doc.add(Style::new(format!(
         "text {{text-anchor: middle;dominant-baseline: central; font-size: {}}}",
         6
     )));
 
-    for y in 0..input.n {
-        for x in 0..input.n {
+    for y in 0..H {
+        for x in 0..W {
             doc = doc.add(
                 rect(
-                    x * w,
-                    W - (y + 1) * h,
-                    w,
-                    h,
-                    &generate_dark_color(state[y][x]),
+                    x,
+                    y,
+                    1,
+                    1,
+                    match state[y][x] {
+                        1 => "tomato",
+                        2 => "green",
+                        3 => "orange",
+                        _ => "white",
+                    },
                 )
-                .set("stroke", "black")
-                .set("stroke-width", 1)
+                // .set("stroke", "black")
+                // .set("stroke-width", 1)
                 .set("class", "box"),
             );
         }
     }
 
-    // (score as i64, "".to_string(), doc.to_string())
+    (score as i64, "".to_string(), doc.to_string())
+}
 
-    if output.m % 10 == 0 {
-        return (999, "error desuyo".to_string(), "".to_string());
+fn score(n: usize, table: &Vec<Vec<usize>>) -> usize {
+    let mut score = 0;
+
+    let patterns = vec![(1, 0), (-1, 0), (0, 1), (0, -1)];
+
+    let mut visited = vec![vec![false; n]; n];
+
+    for i in 0..n {
+        for j in 0..n {
+            if table[i][j] == 0 || visited[i][j] {
+                continue;
+            }
+
+            let candy = table[i][j];
+
+            let mut queue = VecDeque::new();
+            queue.push_back((i, j));
+            visited[i][j] = true;
+
+            let mut count = 0;
+
+            while let Some(current) = queue.pop_front() {
+                count += 1;
+
+                for pattern in &patterns {
+                    let next = (
+                        current.0 as isize + pattern.0,
+                        current.1 as isize + pattern.1,
+                    );
+
+                    if 0 > next.0 || next.0 >= n as isize || 0 > next.1 || next.1 >= n as isize {
+                        continue;
+                    }
+
+                    let next = (next.0 as usize, next.1 as usize);
+
+                    if visited[next.0][next.1] || table[next.0][next.1] != candy {
+                        continue;
+                    }
+
+                    // 次へ
+                    visited[next.0][next.1] = true;
+                    queue.push_back(next);
+                }
+            }
+
+            score += count * count;
+        }
     }
 
-    (
-        input.n as i64 * output.m as i64,
-        "".to_string(),
-        "iikanji dayo".to_string(),
-    )
+    score
+}
+
+fn slide(n: usize, mut table: Vec<Vec<usize>>, pattern: &str) -> Vec<Vec<usize>> {
+    // let mut table = table.clone();
+
+    match pattern {
+        "F" => {
+            // 上に寄せる
+            for j in 0..n {
+                let mut dest = 0;
+
+                for i in dest..n {
+                    if table[i][j] != 0 {
+                        let tmp = table[dest][j];
+                        table[dest][j] = table[i][j];
+                        table[i][j] = tmp;
+
+                        dest += 1;
+                    }
+                }
+            }
+        }
+        "B" => {
+            // 下に寄せる
+            for j in 0..n {
+                let mut dest = n - 1;
+
+                for i in (0..=dest).rev() {
+                    if table[i][j] != 0 {
+                        let tmp = table[dest][j];
+                        table[dest][j] = table[i][j];
+                        table[i][j] = tmp;
+
+                        dest -= 1;
+                    }
+                }
+            }
+        }
+        "L" => {
+            // 左に寄せる
+            for i in 0..n {
+                let mut dest = 0;
+
+                for j in dest..n {
+                    if table[i][j] != 0 {
+                        let tmp = table[i][dest];
+                        table[i][dest] = table[i][j];
+                        table[i][j] = tmp;
+
+                        dest += 1;
+                    }
+                }
+            }
+        }
+        _ => {
+            // 右に寄せる
+            for i in 0..n {
+                let mut dest = n - 1;
+
+                for j in (0..=dest).rev() {
+                    if table[i][j] != 0 {
+                        let tmp = table[i][dest];
+                        table[i][dest] = table[i][j];
+                        table[i][j] = tmp;
+
+                        dest -= 1;
+                    }
+                }
+            }
+        }
+    }
+
+    table
+}
+
+fn put_candy(
+    n: usize,
+    turn: usize,
+    f: &Vec<usize>,
+    mut table: Vec<Vec<usize>>,
+    target: usize,
+) -> Vec<Vec<usize>> {
+    let mut target = target;
+    // let mut table = table.clone();
+
+    'search: for i in 0..n {
+        for j in 0..n {
+            if table[i][j] != 0 {
+                continue;
+            }
+
+            target -= 1;
+
+            if target == 0 {
+                // println!("update i {} j {} {} -> {}", i, j, table[i][j], f[turn]);
+                table[i][j] = f[turn];
+                break 'search;
+            }
+        }
+    }
+
+    table
 }
