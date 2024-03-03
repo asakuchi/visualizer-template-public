@@ -69,6 +69,11 @@ pub fn vis(input: &tools::Input, output: &tools::Output, _turn: usize) -> (i64, 
 
     for y in 0..input.n {
         for x in 0..input.n {
+            let text = format!(
+                "rgba(255,0,0,{})",
+                a[y][x] as f64 / (input.n as f64 * input.n as f64)
+            );
+
             doc = doc.add(
                 rect(
                     x * 10,
@@ -80,10 +85,10 @@ pub fn vis(input: &tools::Input, output: &tools::Output, _turn: usize) -> (i64, 
                     } else if (y, x) == p2 {
                         "green"
                     } else {
-                        "white"
+                        &text
                     },
                 )
-                .set("stroke", "black")
+                .set("stroke", "#dddddd")
                 .set("stroke-width", 1)
                 .set("class", "box"),
             );
