@@ -1,13 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Heuristic Contest Visualizer</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Heuristic Contest Visualizer</title>
+  <style>
+    #tooltip {
+      position: absolute;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 5px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <script>
+    window.refreshEvents = () => {
+      console.log("refresh evetnts");
+
+      const tooltip = document.getElementById('tooltip');
+      const boxes = document.getElementsByClassName('box');
+
+      for (let i = 0; i < boxes.length; i++) {
+        const element = boxes[i];
+        const value = element.dataset.num;
+
+        element.addEventListener('mouseover', (event) => {
+          const mouseX = event.pageX;
+          const mouseY = event.pageY;
+
+          // const rectContent = rectangle.textContent.trim();
+          tooltip.textContent = `${value}`;
+          tooltip.style.display = 'block';
+
+          tooltip.style.top = `${mouseY - 30}px`; // マウスの上に表示
+          tooltip.style.left = `${mouseX + 20}px`; // マウスの右に表示
+        });
+
+        element.addEventListener('mouseout', () => {
+          tooltip.style.display = 'none';
+        });
+      }
+    };
+
+  </script>
+
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+
+  <div id="tooltip"></div>
+</body>
+
 </html>
