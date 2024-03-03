@@ -8,7 +8,7 @@ use web_sys::console::log_1;
 
 use super::tools;
 
-const VIEW_SIZE: usize = 100;
+const VIEW_SIZE: usize = 1000;
 
 pub fn vis(input: &tools::Input, output: &tools::Output, _turn: usize) -> (i64, String, String) {
     log_1(&"start vis".into());
@@ -67,7 +67,8 @@ pub fn vis(input: &tools::Input, output: &tools::Output, _turn: usize) -> (i64, 
     use svg::node::element::path::Data;
     use svg::node::element::Path;
 
-    let cell_size = 10;
+    let cell_size = VIEW_SIZE / input.n;
+    let stroke_size = VIEW_SIZE / input.n / 10;
 
     for y in 0..input.n {
         for x in 0..input.n {
@@ -91,7 +92,7 @@ pub fn vis(input: &tools::Input, output: &tools::Output, _turn: usize) -> (i64, 
                     },
                 )
                 .set("stroke", "#dddddd")
-                .set("stroke-width", 1)
+                .set("stroke-width", stroke_size)
                 .set("class", "box"),
             );
         }
@@ -110,7 +111,7 @@ pub fn vis(input: &tools::Input, output: &tools::Output, _turn: usize) -> (i64, 
                 let path = Path::new()
                     .set("fill", "none")
                     .set("stroke", "black")
-                    .set("stroke-width", 1)
+                    .set("stroke-width", stroke_size)
                     .set("d", data);
 
                 doc = doc.add(path);
@@ -127,7 +128,7 @@ pub fn vis(input: &tools::Input, output: &tools::Output, _turn: usize) -> (i64, 
                 let path = Path::new()
                     .set("fill", "none")
                     .set("stroke", "black")
-                    .set("stroke-width", 1)
+                    .set("stroke-width", stroke_size)
                     .set("d", data);
 
                 doc = doc.add(path);
