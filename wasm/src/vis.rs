@@ -3,10 +3,7 @@
 // use proconio::input;
 // use rand::prelude::*;
 // use std::{collections::VecDeque, usize};
-use svg::node::{
-    element::{Rectangle, Style},
-    Text,
-};
+use svg::node::element::{Rectangle, Style};
 use web_sys::console::log_1;
 
 use super::tools;
@@ -67,6 +64,11 @@ pub fn vis(input: &tools::Input, output: &tools::Output, _turn: usize) -> (i64, 
         6
     )));
 
+    use svg::node::element::path::Data;
+    use svg::node::element::Path;
+
+    let cell_size = 10;
+
     for y in 0..input.n {
         for x in 0..input.n {
             let text = format!(
@@ -76,10 +78,10 @@ pub fn vis(input: &tools::Input, output: &tools::Output, _turn: usize) -> (i64, 
 
             doc = doc.add(
                 rect(
-                    x * 10,
-                    y * 10,
-                    10,
-                    10,
+                    x * cell_size,
+                    y * cell_size,
+                    cell_size,
+                    cell_size,
                     if (y, x) == p1 {
                         "blue"
                     } else if (y, x) == p2 {
@@ -92,17 +94,44 @@ pub fn vis(input: &tools::Input, output: &tools::Output, _turn: usize) -> (i64, 
                 .set("stroke-width", 1)
                 .set("class", "box"),
             );
+        }
+    }
 
-            let text_node = svg::node::Text::new(a[y][x].to_string());
-            let text_element = svg::node::element::Text::new()
-                .set("x", x * 10 + 5)
-                .set("y", y * 10 + 5)
-                .set("fill", "cornflowerblue")
-                .set("font-family", "游明朝")
-                .set("font-size", "3")
-                .add(text_node);
+    for y in 0..input.n {
+        for x in 0..input.n {
+            if y != input.n - 1 && x != input.n - 1 && input.vs[y][x] == '1' {
+                log_1(&format!("y {y} vs {}", input.vs[y][x]).into());
 
-            doc = doc.add(text_element);
+                let data = Data::new()
+                    .move_to((x * cell_size + cell_size, y * cell_size))
+                    .line_by((0, cell_size))
+                    .close();
+
+                let path = Path::new()
+                    .set("fill", "none")
+                    .set("stroke", "black")
+                    .set("stroke-width", 1)
+                    .set("d", data);
+
+                doc = doc.add(path);
+            }
+
+            if y != input.n - 1 && x != input.n - 1 && input.hs[y][x] == '1' {
+                log_1(&format!("y {y} vs {}", input.hs[y][x]).into());
+
+                let data = Data::new()
+                    .move_to((x * cell_size, y * cell_size + cell_size))
+                    .line_by((cell_size, 0))
+                    .close();
+
+                let path = Path::new()
+                    .set("fill", "none")
+                    .set("stroke", "black")
+                    .set("stroke-width", 1)
+                    .set("d", data);
+
+                doc = doc.add(path);
+            }
         }
     }
 
