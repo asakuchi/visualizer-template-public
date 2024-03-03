@@ -101,7 +101,7 @@ pub fn vis(input: &tools::Input, output: &tools::Output, _turn: usize) -> (i64, 
 
     for y in 0..input.n {
         for x in 0..input.n {
-            if y != input.n - 1 && x != input.n - 1 && input.vs[y][x] == '1' {
+            if x != input.n - 1 && input.vs[y][x] == '1' {
                 let data = Data::new()
                     .move_to((x * cell_size + cell_size, y * cell_size))
                     .line_by((0, cell_size))
@@ -116,7 +116,7 @@ pub fn vis(input: &tools::Input, output: &tools::Output, _turn: usize) -> (i64, 
                 doc = doc.add(path);
             }
 
-            if y != input.n - 1 && x != input.n - 1 && input.hs[y][x] == '1' {
+            if y != input.n - 1 && input.hs[y][x] == '1' {
                 let data = Data::new()
                     .move_to((x * cell_size, y * cell_size + cell_size))
                     .line_by((cell_size, 0))
