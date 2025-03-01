@@ -1,3 +1,48 @@
+# 事前準備
+
+WASM の準備
+
+```
+cargo install wasm-pack
+```
+
+node の準備
+
+```
+curl https://get.volta.sh | bash
+volta install node@latest
+```
+
+# 動かす
+
+```
+npm install
+npm run build
+npm run dev
+```
+
+# デプロイ
+
+vercel のメニューから Deployments を選ぶ。
+1行の右端の…から「Promote to Production」を選ぶ。
+
+# いじる
+
+画面の説明
+
+src/components/Description/index.tsx
+
+本体
+
+wasm/src/lib.rs
+
+-------------------------------------------------------------
+
+以下オリジナルreadme
+
+-------------------------------------------------------------
+
+
 # ヒューリスティックコンテスト ビジュアライザ開発のためのテンプレート
 AHCのビジュアライザと似た機能を持ったビジュアライザを開発する際のテンプレートです。
 コンテストごとに以下の処理を書き換えると、そのコンテスト用のビジュアライザをwebアプリ上で動かすことができます。
