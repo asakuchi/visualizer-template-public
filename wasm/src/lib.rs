@@ -4,8 +4,8 @@ mod tools;
 mod vis;
 
 #[wasm_bindgen]
-pub fn gen(seed: i32) -> String {
-    tools::gen(seed as u64, "A").to_string()
+pub fn gen(seed: i32, problem: String) -> String {
+    tools::gen(seed as u64, &problem).to_string()
 }
 
 #[wasm_bindgen(getter_with_clone)]

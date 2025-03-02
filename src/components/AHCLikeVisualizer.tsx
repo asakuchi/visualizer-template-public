@@ -15,6 +15,7 @@ const AHCLikeVisualizer: FC = () => {
       input: '',
       output: '',
       seed: 0,
+      problem: 'A',
       turn: 0,
       maxTurn: 0,
     });
@@ -26,15 +27,18 @@ const AHCLikeVisualizer: FC = () => {
   });
 
   useEffect(() => {
-    const inputText = gen(visualizerSettingInfo.seed);
+    const inputText = gen(
+      visualizerSettingInfo.seed,
+      visualizerSettingInfo.problem,
+    );
     setVisualizerSettingInfo((prev) => ({ ...prev, input: inputText }));
-  }, [visualizerSettingInfo.seed]);
+  }, [visualizerSettingInfo.seed, visualizerSettingInfo.problem]);
 
   useEffect(() => {
     try {
       const maxTurn = getMaxTurn(
         visualizerSettingInfo.input,
-        visualizerSettingInfo.output
+        visualizerSettingInfo.output,
       );
       setVisualizerSettingInfo((prev) => ({
         ...prev,
@@ -60,7 +64,7 @@ const AHCLikeVisualizer: FC = () => {
       const ret = vis(
         visualizerSettingInfo.input,
         visualizerSettingInfo.output,
-        visualizerSettingInfo.turn
+        visualizerSettingInfo.turn,
       );
       console.log(ret);
       setVisualizerResult({

@@ -27,6 +27,13 @@ const InputOutput: FC<InputOutputProps> = ({
     }));
   };
 
+  const onChangeProblem = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setVisualizerSettingInfo((prev) => ({
+      ...prev,
+      problem: e.target.value,
+    }));
+  };
+
   const onChangeInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setVisualizerSettingInfo((prev) => ({
       ...prev,
@@ -55,6 +62,16 @@ const InputOutput: FC<InputOutputProps> = ({
           />
         </label>
         <label>
+          問題:
+          <select onChange={onChangeProblem}>
+            <option value="A" defaultChecked>
+              A
+            </option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+          </select>
+        </label>
+        <label>
           #cases:
           <input
             type="number"
@@ -73,8 +90,9 @@ const InputOutput: FC<InputOutputProps> = ({
           onClick={() => {
             downloadInput(
               visualizerSettingInfo.seed,
+              visualizerSettingInfo.problem,
               downloadCases,
-              setButtonText
+              setButtonText,
             );
           }}
         />
