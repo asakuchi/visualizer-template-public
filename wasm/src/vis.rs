@@ -151,9 +151,9 @@ pub fn vis(input: &tools::Input, output: &tools::Output, turn: usize) -> (i64, S
                     if cs[y][x] == 'A' {
                         "red"
                     } else if cs[y][x] == 'B' {
-                        "blue"
-                    } else if cs[y][x] == 'C' {
                         "green"
+                    } else if cs[y][x] == 'C' {
+                        "blue"
                     } else if cs[y][x] == 'a' {
                         "#FFDDDD"
                     } else if cs[y][x] == 'b' {
@@ -196,9 +196,9 @@ pub fn vis(input: &tools::Input, output: &tools::Output, turn: usize) -> (i64, S
                         if cs[y][x] == 'A' {
                             "red"
                         } else if cs[y][x] == 'B' {
-                            "blue"
-                        } else if cs[y][x] == 'C' {
                             "green"
+                        } else if cs[y][x] == 'C' {
+                            "blue"
                         } else if cs[y][x] == 'a' {
                             "#FFDDDD"
                         } else if cs[y][x] == 'b' {
