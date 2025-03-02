@@ -116,9 +116,31 @@ pub fn vis(input: &tools::Input, output: &tools::Output, turn: usize) -> (i64, S
     let cell_size = VIEW_SIZE / input.N;
     let stroke_size = VIEW_SIZE / input.N / 10;
 
+    // for y in 0..input.N {
+    //     for x in 0..input.N {
+    //         // let text = format!("rgba(255,0,0,{})", cs[y][x]);
+
+    //         doc = doc.add(
+    //             rect(x * cell_size, y * cell_size, cell_size, cell_size, "white")
+    //                 .set("stroke", "black")
+    //                 .set("stroke-width", stroke_size)
+    //                 .set("class", "box"), // .set("data-num", a[y][x])
+    //         );
+    //     }
+    // }
+
     for y in 0..input.N {
         for x in 0..input.N {
             // let text = format!("rgba(255,0,0,{})", cs[y][x]);
+
+            // if (y, x) == pos {
+            //     doc = doc.add(
+            //         rect(x * cell_size, y * cell_size, cell_size, cell_size, "white")
+            //             .set("stroke", "orange")
+            //             .set("stroke-width", stroke_size)
+            //             .set("class", "box"), // .set("data-num", a[y][x])
+            //     );
+            // }
 
             doc = doc.add(
                 rect(
@@ -126,16 +148,23 @@ pub fn vis(input: &tools::Input, output: &tools::Output, turn: usize) -> (i64, S
                     y * cell_size,
                     cell_size,
                     cell_size,
-                    if (y, x) == pos { "red" } else { "white" },
-                    // if (y, x) == p1 {
-                    //     "blue"
-                    // } else if (y, x) == p2 {
-                    //     "green"
-                    // } else {
-                    //     &text
-                    // },
+                    if cs[y][x] == 'A' {
+                        "red"
+                    } else if cs[y][x] == 'B' {
+                        "blue"
+                    } else if cs[y][x] == 'C' {
+                        "green"
+                    } else if cs[y][x] == 'a' {
+                        "#FFDDDD"
+                    } else if cs[y][x] == 'b' {
+                        "#DDFFDD"
+                    } else if cs[y][x] == 'c' {
+                        "#DDDDFF"
+                    } else {
+                        "white"
+                    },
                 )
-                .set("stroke", "#000000")
+                .set("stroke", if (y, x) == pos { "orange" } else { "black" })
                 .set("stroke-width", stroke_size)
                 .set("class", "box"), // .set("data-num", a[y][x])
             );
@@ -150,6 +179,52 @@ pub fn vis(input: &tools::Input, output: &tools::Output, turn: usize) -> (i64, S
                     .add(svg::node::Text::new(cs[y][x]));
 
                 doc = doc.add(text);
+            }
+        }
+    }
+
+    // 現在地を同じ内容でもう一度
+    for y in 0..input.N {
+        for x in 0..input.N {
+            if (y, x) == pos {
+                doc = doc.add(
+                    rect(
+                        x * cell_size,
+                        y * cell_size,
+                        cell_size,
+                        cell_size,
+                        if cs[y][x] == 'A' {
+                            "red"
+                        } else if cs[y][x] == 'B' {
+                            "blue"
+                        } else if cs[y][x] == 'C' {
+                            "green"
+                        } else if cs[y][x] == 'a' {
+                            "#FFDDDD"
+                        } else if cs[y][x] == 'b' {
+                            "#DDFFDD"
+                        } else if cs[y][x] == 'c' {
+                            "#DDDDFF"
+                        } else {
+                            "white"
+                        },
+                    )
+                    .set("stroke", if (y, x) == pos { "orange" } else { "black" })
+                    .set("stroke-width", stroke_size)
+                    .set("class", "box"), // .set("data-num", a[y][x])
+                );
+
+                if cs[y][x] != '.' {
+                    let text = Text::new()
+                        .set("x", x * cell_size + 20) // 中央付近
+                        .set("y", y * cell_size + 20)
+                        .set("font-size", 30)
+                        .set("text-anchor", "middle") // 文字を中央揃えに
+                        .set("fill", "black") // 文字の色
+                        .add(svg::node::Text::new(cs[y][x]));
+
+                    doc = doc.add(text);
+                }
             }
         }
     }
